@@ -2,7 +2,8 @@
 
 A production-ready, real-time customer support chat system with an embeddable widget and admin dashboard built with Next.js 16, Socket.io, and Prisma.
 
-![Chat Widget Demo](https://placehold.co/800x400/0891b2/ffffff?text=Chat+Widget+Demo)
+![Chat Widget Demo](<img width="1667" height="986" alt="Screenshot 2026-01-15 at 22 14 32" src="https://github.com/user-attachments/assets/0dde4f11-385e-4840-be6b-26f78a7fdb1a" />
+)
 
 ## ✨ Features
 
