@@ -1,0 +1,83 @@
+// Prisma schema for Real-time Chat Support Widget System
+// https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================
+// AGENT MODEL - Support agents who handle conversations
+// ============================================
+model Agent {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  name          String
+  password      String         // bcrypt hashed
+  isOnline      Boolean        @default(false)
+  lastSeen      DateTime       @default(now())
+  conversations Conversation[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([email])
+  @@index([isOnline])
+}
+
+// ============================================
+// CONVERSATION MODEL - Chat sessions between customers and agents
+// ============================================
+model Conversation {
+  id            String             @id @default(cuid())
+  customerId    String             // UUID from localStorage
+  customerName  String?
+  customerEmail String?
+  agentId       String?
+  agent         Agent?             @relation(fields: [agentId], references: [id], onDelete: SetNull)
+  status        ConversationStatus @default(open)
+  messages      Message[]
+  unreadCount   Int                @default(0) // Unread count for agent
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  @@index([status, createdAt])
+  @@index([agentId])
+  @@index([customerId])
+}
+
+// ============================================
+// MESSAGE MODEL - Individual messages in conversations
+// ============================================
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String       // Agent ID or Customer UUID
+  senderType     SenderType
+  senderName     String
+  content        String       @db.Text
+  fileUrl        String?
+  fileName       String?
+  isRead         Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId, createdAt])
+  @@index([senderId])
+}
+
+// ============================================
+// ENUMS
+// ============================================
+enum ConversationStatus {
+  open
+  assigned
+  closed
+}
+
+enum SenderType {
+  agent
+  customer
+}
