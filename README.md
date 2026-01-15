@@ -2,7 +2,7 @@
 
 A production-ready, real-time customer support chat system with an embeddable widget and admin dashboard built with Next.js 16, Socket.io, and Prisma.
 
-![Chat Widget Demo]("https://github.com/user-attachments/assets/0dde4f11-385e-4840-be6b-26f78a7fdb1a")
+![Chat Widget Demo]("[https://github.com/user-attachments/assets/0dde4f11-385e-4840-be6b-26f78a7fdb1a](https://bintangmfhd.s3.ap-southeast-3.amazonaws.com/photos/1/Tech/Screenshot%202026-01-15%20at%2022.14.32.png)")
 
 ## ✨ Features
 
