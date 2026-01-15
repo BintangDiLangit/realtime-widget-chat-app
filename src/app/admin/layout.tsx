@@ -21,7 +21,7 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="h-screen flex flex-col bg-background overflow-hidden">
       <AgentHeader
         agent={{
           id: session.user.id,
@@ -29,7 +29,7 @@ export default async function AdminLayout({
           email: session.user.email,
         }}
       />
-      <main className="flex-1 flex overflow-hidden">{children}</main>
+      <main className="flex-1 flex overflow-hidden min-h-0">{children}</main>
       <Toaster position="top-right" />
     </div>
   );

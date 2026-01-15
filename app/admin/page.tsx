@@ -20,6 +20,11 @@ async function getConversations() {
           isOnline: true,
         },
       },
+      tags: {
+        include: {
+          tag: true,
+        },
+      },
       messages: {
         orderBy: { createdAt: "desc" },
         take: 1,
@@ -30,8 +35,14 @@ async function getConversations() {
           createdAt: true,
         },
       },
+      _count: {
+        select: { notes: true },
+      },
     },
-    orderBy: { updatedAt: "desc" },
+    orderBy: [
+      { priority: "desc" },
+      { updatedAt: "desc" },
+    ],
     take: 50,
   });
 

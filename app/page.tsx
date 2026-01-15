@@ -263,7 +263,7 @@ export default function HomePage() {
 
       {/* Chat Widget */}
       <ChatWidget
-        headerText="Support Chat"
+        headerTitle="Support Chat"
         welcomeMessage="Hi there! 👋 How can we help you today?"
         position="bottom-right"
       />

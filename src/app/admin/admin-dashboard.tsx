@@ -87,7 +87,7 @@ export function AdminDashboard({
   }, []);
 
   return (
-    <div className="flex-1 flex overflow-hidden">
+    <div className="flex-1 flex overflow-hidden min-h-0">
       {/* Sidebar */}
       <ConversationList
         initialConversations={conversations}

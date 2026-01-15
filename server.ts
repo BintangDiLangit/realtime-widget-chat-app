@@ -486,10 +486,14 @@ app.prepare().then(async () => {
           message
         );
 
-        // Notify customer
+        // Notify customer directly (even if not in conversation room)
         io.to(`customer:${conversation.customerId}`).emit(
           "message:received",
           message
+        );
+
+        console.log(
+          `[Socket] Agent message sent - Conversation: ${conversationId}, Customer: ${conversation.customerId}, Rooms: conversation:${conversationId}, customer:${conversation.customerId}`
         );
 
         // Notify all agents about updated conversation

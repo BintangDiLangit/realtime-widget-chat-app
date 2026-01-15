@@ -1,6 +1,6 @@
 /**
- * Chat Widget Component
- * Complete embeddable chat widget with button and window
+ * Chat Widget Component - 2025 Modern Design
+ * Main widget container with button entrance animation
  */
 
 "use client";
@@ -8,104 +8,132 @@
 import { useState, useCallback, useEffect } from "react";
 import { ChatButton } from "./chat-button";
 import { ChatWindow } from "./chat-window";
-import { ChatErrorBoundary } from "@/src/components/error-boundary";
-import type { WidgetConfig } from "@/src/types";
+import { cn } from "@/lib/utils";
 
-interface ChatWidgetProps extends WidgetConfig {
-  defaultOpen?: boolean;
+interface ChatWidgetProps {
+  headerTitle?: string;
+  welcomeMessage?: string;
+  requireName?: boolean;
+  requireEmail?: boolean;
+  position?: "bottom-right" | "bottom-left";
+  buttonSize?: "small" | "medium" | "large";
+  className?: string;
 }
 
 export function ChatWidget({
-  position = "bottom-right",
-  primaryColor,
-  headerText = "Support Chat",
-  placeholderText,
+  headerTitle = "Support Chat",
   welcomeMessage = "Hi there! 👋 How can we help you today?",
-  requireEmail = false,
   requireName = false,
-  defaultOpen = false,
+  requireEmail = false,
+  position = "bottom-right",
+  buttonSize = "medium",
+  className,
 }: ChatWidgetProps) {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [showButton, setShowButton] = useState(false);
 
-  // Handle open/close
+  // Delayed button entrance animation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowButton(true);
+    }, 1000); // 1 second delay after page load
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleToggle = useCallback(() => {
-    setIsOpen((prev) => !prev);
-    // Clear unread when opening
+    if (isMinimized) {
+      setIsMinimized(false);
+    } else {
+      setIsOpen(!isOpen);
+    }
     if (!isOpen) {
       setUnreadCount(0);
     }
-  }, [isOpen]);
+  }, [isOpen, isMinimized]);
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
+    setIsMinimized(false);
   }, []);
 
   const handleMinimize = useCallback(() => {
+    setIsMinimized(true);
     setIsOpen(false);
   }, []);
 
-  // Handle unread count changes
-  const handleUnreadChange = useCallback(
-    (count: number) => {
-      if (!isOpen) {
-        setUnreadCount((prev) => prev + count);
-      }
-    },
-    [isOpen]
-  );
-
-  // Apply custom primary color
-  useEffect(() => {
-    if (primaryColor) {
-      document.documentElement.style.setProperty(
-        "--widget-primary",
-        primaryColor
-      );
+  const handleUnreadChange = useCallback((count: number) => {
+    if (!isOpen) {
+      setUnreadCount((prev) => Math.max(0, prev + count));
     }
-  }, [primaryColor]);
-
-  // Handle escape key to close
-  useEffect(() => {
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && isOpen) {
-        handleClose();
-      }
-    };
-
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [isOpen, handleClose]);
+  }, [isOpen]);
 
   // Position classes
-  const positionClasses =
-    position === "bottom-left"
-      ? "left-4 sm:left-6"
-      : "right-4 sm:right-6";
+  const positionClasses = {
+    "bottom-right": "right-6 bottom-6",
+    "bottom-left": "left-6 bottom-6",
+  };
+
+  // Button size classes
+  const buttonSizeClasses = {
+    small: "w-12 h-12",
+    medium: "w-14 h-14 sm:w-16 sm:h-16",
+    large: "w-16 h-16 sm:w-18 sm:h-18",
+  };
 
   return (
-    <ChatErrorBoundary>
+    <div 
+      className={cn("fixed z-[9999]", positionClasses[position], className)}
+      role="region"
+      aria-label="Chat support widget"
+    >
       {/* Chat Window */}
-      <ChatWindow
-        isOpen={isOpen}
-        onClose={handleClose}
-        onMinimize={handleMinimize}
-        onUnreadChange={handleUnreadChange}
-        headerTitle={headerText}
-        welcomeMessage={welcomeMessage}
-        requireName={requireName}
-        requireEmail={requireEmail}
-      />
+      {isOpen && !isMinimized && (
+        <ChatWindow
+          isOpen={isOpen}
+          onClose={handleClose}
+          onMinimize={handleMinimize}
+          onUnreadChange={handleUnreadChange}
+          headerTitle={headerTitle}
+          welcomeMessage={welcomeMessage}
+          requireName={requireName}
+          requireEmail={requireEmail}
+          className={cn(
+            "absolute",
+            position === "bottom-right" 
+              ? "bottom-20 right-0" 
+              : "bottom-20 left-0"
+          )}
+        />
+      )}
 
       {/* Chat Button */}
-      <div className={`fixed bottom-4 sm:bottom-6 z-50 ${positionClasses}`}>
-        <ChatButton
-          isOpen={isOpen}
-          onClick={handleToggle}
-          unreadCount={unreadCount}
-        />
-      </div>
-    </ChatErrorBoundary>
+      {showButton && (
+        <div 
+          className={cn(
+            "slide-up",
+            buttonSizeClasses[buttonSize]
+          )}
+        >
+          <ChatButton
+            isOpen={isOpen}
+            onClick={handleToggle}
+            unreadCount={unreadCount}
+            className={buttonSizeClasses[buttonSize]}
+          />
+        </div>
+      )}
+
+      {/* Skip link for screen readers */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:p-2 focus:bg-background focus:text-foreground"
+      >
+        Skip to main content
+      </a>
+    </div>
   );
 }
 

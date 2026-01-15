@@ -1,140 +1,167 @@
 /**
- * Chat Header Component
- * Header for the chat widget with agent info and controls
+ * Chat Header Component - 2025 Modern Design
+ * Glassmorphism with status indicator and micro-interactions
  */
 
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Minus, X, MoreVertical } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Minus, X } from "lucide-react";
 
 interface ChatHeaderProps {
   title?: string;
-  subtitle?: string;
-  isOnline?: boolean;
   agentName?: string;
+  agentAvatar?: string;
+  isOnline?: boolean;
   onMinimize?: () => void;
   onClose?: () => void;
-  onEndChat?: () => void;
   className?: string;
 }
 
 export function ChatHeader({
   title = "Support Chat",
-  subtitle,
-  isOnline = false,
   agentName,
+  agentAvatar,
+  isOnline = false,
   onMinimize,
   onClose,
-  onEndChat,
   className,
 }: ChatHeaderProps) {
-  const displaySubtitle =
-    subtitle ||
-    (agentName
-      ? `Chatting with ${agentName}`
-      : isOnline
-      ? "We're online"
-      : "We'll respond soon");
+  const displayName = agentName || title;
+  const initials = displayName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
 
   return (
-    <div
+    <header
       className={cn(
-        "flex items-center gap-3 px-4 py-3",
-        "bg-primary text-primary-foreground",
-        "rounded-t-xl",
+        "relative flex items-center justify-between",
+        "h-[60px] px-4",
+        // Glassmorphism
+        "bg-white/5 backdrop-blur-xl",
+        "border-b border-white/10",
         className
       )}
     >
-      {/* Avatar */}
-      <Avatar className="w-10 h-10 border-2 border-primary-foreground/20">
-        <AvatarFallback className="bg-primary-foreground/20 text-primary-foreground font-semibold">
-          {agentName ? agentName[0].toUpperCase() : "S"}
-        </AvatarFallback>
-      </Avatar>
-
-      {/* Title and status */}
-      <div className="flex-1 min-w-0">
-        <h2 className="font-semibold text-sm truncate">{title}</h2>
-        <div className="flex items-center gap-1.5">
+      {/* Agent Info */}
+      <div className="flex items-center gap-3">
+        {/* Avatar with status */}
+        <div className="relative">
+          <Avatar className="w-9 h-9 border-2 border-white/20">
+            {agentAvatar ? (
+              <AvatarImage src={agentAvatar} alt={displayName} />
+            ) : null}
+            <AvatarFallback 
+              className={cn(
+                "text-xs font-semibold",
+                "bg-gradient-to-br from-neutral-700 to-neutral-900",
+                "text-white"
+              )}
+            >
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+          
+          {/* Online status dot */}
           <span
             className={cn(
-              "w-2 h-2 rounded-full",
-              isOnline ? "bg-green-400" : "bg-primary-foreground/40"
+              "absolute -bottom-0.5 -right-0.5",
+              "w-3 h-3 rounded-full",
+              "border-2 border-[#0A0E27]",
+              "transition-colors duration-300",
+              isOnline 
+                ? "bg-emerald-500 status-glow" 
+                : "bg-gray-500"
             )}
+            aria-label={isOnline ? "Online" : "Offline"}
           />
-          <span className="text-xs text-primary-foreground/80 truncate">
-            {displaySubtitle}
+        </div>
+
+        {/* Name & Status */}
+        <div className="flex flex-col">
+          <span className="text-sm font-semibold text-white leading-tight">
+            {displayName}
+          </span>
+          <span 
+            className={cn(
+              "text-[11px] leading-tight flex items-center gap-1",
+              isOnline ? "text-emerald-400" : "text-gray-400"
+            )}
+          >
+            <span 
+              className={cn(
+                "w-1.5 h-1.5 rounded-full",
+                isOnline ? "bg-emerald-500" : "bg-gray-500"
+              )}
+            />
+            {isOnline ? "Online • Replies in ~2 min" : "Offline"}
           </span>
         </div>
       </div>
 
-      {/* Actions */}
+      {/* Action Buttons */}
       <div className="flex items-center gap-1">
-        {/* More options */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              className={cn(
-                "p-1.5 rounded-full",
-                "hover:bg-primary-foreground/10",
-                "transition-colors",
-                "focus:outline-none focus:ring-2 focus:ring-primary-foreground/30"
-              )}
-              aria-label="More options"
-            >
-              <MoreVertical className="w-4 h-4" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-40">
-            {onEndChat && (
-              <DropdownMenuItem onClick={onEndChat} className="text-destructive">
-                End conversation
-              </DropdownMenuItem>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        {/* Minimize button */}
+        {/* Minimize */}
         {onMinimize && (
           <button
             onClick={onMinimize}
             className={cn(
-              "p-1.5 rounded-full",
-              "hover:bg-primary-foreground/10",
-              "transition-colors",
-              "focus:outline-none focus:ring-2 focus:ring-primary-foreground/30"
+              "group flex items-center justify-center",
+              "w-8 h-8 rounded-lg",
+              "text-gray-400 hover:text-white",
+              "hover:bg-white/10",
+              "transition-all duration-200",
+              "focus:outline-none focus:ring-2 focus:ring-neutral-400/40"
             )}
             aria-label="Minimize chat"
           >
-            <Minus className="w-4 h-4" />
+            <Minus 
+              className={cn(
+                "w-4 h-4",
+                "transition-transform duration-200",
+                "group-hover:-rotate-90"
+              )} 
+            />
           </button>
         )}
 
-        {/* Close button */}
+        {/* Close */}
         {onClose && (
           <button
             onClick={onClose}
             className={cn(
-              "p-1.5 rounded-full",
-              "hover:bg-primary-foreground/10",
-              "transition-colors",
-              "focus:outline-none focus:ring-2 focus:ring-primary-foreground/30"
+              "group flex items-center justify-center",
+              "w-8 h-8 rounded-lg",
+              "text-gray-400",
+              "hover:text-white hover:bg-red-500/80",
+              "transition-all duration-200",
+              "focus:outline-none focus:ring-2 focus:ring-red-500/40"
             )}
             aria-label="Close chat"
           >
-            <X className="w-4 h-4" />
+            <X 
+              className={cn(
+                "w-4 h-4",
+                "transition-transform duration-200",
+                "group-hover:rotate-90 group-hover:scale-110"
+              )} 
+            />
           </button>
         )}
       </div>
-    </div>
+
+      {/* Subtle gradient line at bottom */}
+      <div 
+        className="absolute bottom-0 left-0 right-0 h-[1px]"
+        style={{
+          background: "linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%)"
+        }}
+      />
+    </header>
   );
 }
 

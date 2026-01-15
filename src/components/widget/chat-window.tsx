@@ -1,6 +1,6 @@
 /**
- * Chat Window Component
- * Main chat interface combining header, messages, and input
+ * Chat Window Component - 2025 Modern Design
+ * Glassmorphism design with advanced animations
  */
 
 "use client";
@@ -197,12 +197,39 @@ export function ChatWindow({
     [customerId]
   );
 
-  // Subscribe to conversation events
+  // Subscribe to conversation events (only when conversationId exists)
   useConversationEvents(conversationId, {
     onMessage: handleMessage,
     onTypingStart: handleTypingStart,
     onTypingStop: handleTypingStop,
   });
+
+  // Also listen to customer-specific messages when conversationId is null
+  // This ensures customers receive messages even before a conversation is created
+  useEffect(() => {
+    if (!isConnected || !customerId || conversationId) return; // Only when no conversationId
+
+    const socket = socketRef.current;
+
+    const handleCustomerMessage = (message: Message) => {
+      // Only handle agent messages for this customer
+      if (message.senderType !== "agent") return;
+      if (message.senderId === customerId) return; // Ignore own messages
+      
+      // Update conversation ID if new
+      if (message.conversationId) {
+        setConversationId(message.conversationId);
+      }
+
+      handleMessage(message);
+    };
+
+    socket.on("message:received", handleCustomerMessage);
+
+    return () => {
+      socket.off("message:received", handleCustomerMessage);
+    };
+  }, [isConnected, customerId, conversationId, handleMessage]);
 
   // Handle agent status updates
   useAgentEvents({
@@ -316,21 +343,38 @@ export function ChatWindow({
     <div
       className={cn(
         "fixed z-50",
-        "w-[380px] h-[600px]",
-        "max-w-[calc(100vw-32px)] max-h-[calc(100vh-100px)]",
-        "bottom-24 right-4",
-        "flex flex-col",
-        "bg-background rounded-xl shadow-2xl",
-        "border overflow-hidden",
+        // Desktop size
+        "w-[400px] h-[600px]",
+        // Position
+        "bottom-24 right-6",
+        // Glassmorphism container
+        "flex flex-col overflow-hidden",
+        "rounded-2xl",
+        // Dark theme glassmorphism
+        "bg-[#0A0E27]/95 dark:bg-[#0A0E27]/95",
+        "backdrop-blur-xl",
+        "border border-white/10",
+        // Modern shadow
+        "shadow-[0_8px_32px_rgba(0,0,0,0.4)]",
+        // Animation
         "widget-enter",
-        // Mobile: full screen
-        "sm:w-[380px] sm:h-[600px] sm:bottom-24 sm:right-4",
+        // Mobile responsive - full screen
         "max-sm:w-full max-sm:h-full max-sm:bottom-0 max-sm:right-0 max-sm:rounded-none max-sm:max-w-full max-sm:max-h-full",
         className
       )}
       role="dialog"
       aria-label="Chat window"
+      aria-modal="true"
     >
+      {/* Gradient glow effect behind */}
+      <div 
+        className="absolute -inset-[1px] rounded-2xl opacity-30 blur-sm max-sm:rounded-none"
+        style={{
+          background: "linear-gradient(135deg, #4A4A4A 0%, #1A1A1A 50%, #4A4A4A 100%)",
+          zIndex: -1,
+        }}
+      />
+
       {/* Header */}
       <ChatHeader
         title={headerTitle}
@@ -351,8 +395,8 @@ export function ChatWindow({
         <>
           {/* Welcome message */}
           {welcomeMessage && messages.length === 0 && !isLoading && (
-            <div className="px-4 py-3 bg-primary/5 border-b">
-              <p className="text-sm text-muted-foreground">{welcomeMessage}</p>
+            <div className="px-4 py-3 bg-zinc-500/10 border-b border-white/5">
+              <p className="text-sm text-gray-300">{welcomeMessage}</p>
             </div>
           )}
 
@@ -378,8 +422,18 @@ export function ChatWindow({
 
       {/* Connection status indicator */}
       {!isConnected && chatState === "chat" && (
-        <div className="absolute top-14 left-0 right-0 bg-yellow-500/90 text-yellow-950 text-xs text-center py-1">
-          Connecting...
+        <div 
+          className={cn(
+            "absolute top-[60px] left-0 right-0",
+            "bg-amber-500/90 backdrop-blur-sm",
+            "text-amber-950 text-xs font-medium text-center py-1.5",
+            "slide-down"
+          )}
+        >
+          <span className="inline-flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 bg-amber-950 rounded-full animate-pulse" />
+            Connecting...
+          </span>
         </div>
       )}
     </div>

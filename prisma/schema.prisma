@@ -13,15 +13,17 @@ datasource db {
 // AGENT MODEL - Support agents who handle conversations
 // ============================================
 model Agent {
-  id            String         @id @default(cuid())
-  email         String         @unique
-  name          String
-  password      String         // bcrypt hashed
-  isOnline      Boolean        @default(false)
-  lastSeen      DateTime       @default(now())
-  conversations Conversation[]
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  id              String           @id @default(cuid())
+  email           String           @unique
+  name            String
+  password        String           // bcrypt hashed
+  isOnline        Boolean          @default(false)
+  lastSeen        DateTime         @default(now())
+  conversations   Conversation[]
+  cannedResponses CannedResponse[]
+  notes           Note[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 
   @@index([email])
   @@index([isOnline])
@@ -38,7 +40,11 @@ model Conversation {
   agentId       String?
   agent         Agent?             @relation(fields: [agentId], references: [id], onDelete: SetNull)
   status        ConversationStatus @default(open)
+  priority      Priority           @default(normal)
+  dueAt         DateTime?          // SLA deadline (optional)
   messages      Message[]
+  tags          ConversationTag[]
+  notes         Note[]
   unreadCount   Int                @default(0) // Unread count for agent
   createdAt     DateTime           @default(now())
   updatedAt     DateTime           @updatedAt
@@ -46,6 +52,7 @@ model Conversation {
   @@index([status, createdAt])
   @@index([agentId])
   @@index([customerId])
+  @@index([priority, createdAt])
 }
 
 // ============================================
@@ -69,6 +76,77 @@ model Message {
 }
 
 // ============================================
+// CANNED RESPONSE MODEL - Quick replies for agents
+// ============================================
+model CannedResponse {
+  id         String   @id @default(cuid())
+  agentId    String?  // null = shared with all agents
+  agent      Agent?   @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  shortcut   String   // e.g., "/greeting", "/refund"
+  title      String   // e.g., "Welcome Message"
+  content    String   @db.Text
+  category   String?  // e.g., "Greetings", "Technical", "Billing"
+  usageCount Int      @default(0)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([agentId, shortcut])
+  @@index([agentId, isActive])
+  @@index([category])
+}
+
+// ============================================
+// TAG MODEL - Labels for organizing conversations
+// ============================================
+model Tag {
+  id            String            @id @default(cuid())
+  name          String            @unique
+  color         String            // hex color (e.g., "#3B82F6")
+  description   String?
+  conversations ConversationTag[]
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@index([name])
+}
+
+// ============================================
+// CONVERSATION TAG - Many-to-many relationship
+// ============================================
+model ConversationTag {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  tagId          String
+  tag            Tag          @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  addedBy        String       // Agent ID who added the tag
+  createdAt      DateTime     @default(now())
+
+  @@unique([conversationId, tagId])
+  @@index([conversationId])
+  @@index([tagId])
+}
+
+// ============================================
+// NOTE MODEL - Internal notes for agents
+// ============================================
+model Note {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  agentId        String
+  agent          Agent        @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  content        String       @db.Text
+  isPinned       Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([conversationId, createdAt])
+  @@index([agentId])
+}
+
+// ============================================
 // ENUMS
 // ============================================
 enum ConversationStatus {
@@ -80,4 +158,11 @@ enum ConversationStatus {
 enum SenderType {
   agent
   customer
+}
+
+enum Priority {
+  low
+  normal
+  high
+  urgent
 }

@@ -10,8 +10,8 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   UserPlus,
   X,
@@ -21,10 +21,15 @@ import {
   Hash,
   Clock,
   Loader2,
+  Tag,
+  StickyNote,
 } from "lucide-react";
 import { MessageBubble } from "@/src/components/widget/message-bubble";
 import { MessageInput } from "@/src/components/widget/message-input";
 import { TypingIndicator } from "@/src/components/widget/typing-indicator";
+import { PrioritySelector } from "./priority-selector";
+import { TagSelector } from "./tag-selector";
+import { NotesSection } from "./notes-section";
 import { useConversationEvents } from "@/src/hooks/use-socket";
 import { getSocket, connectSocket } from "@/src/lib/socket-client";
 import {
@@ -40,7 +45,7 @@ import {
   debounce,
   playNotificationSound,
 } from "@/src/lib/utils";
-import type { ConversationListItem, Message, TypingIndicatorPayload } from "@/src/types";
+import type { ConversationListItem, Message, TypingIndicatorPayload, Priority, ConversationTag } from "@/src/types";
 
 interface ConversationViewProps {
   conversation: ConversationListItem;
@@ -62,8 +67,16 @@ export function ConversationView({
   const [typingUser, setTypingUser] = useState<TypingIndicatorPayload | null>(null);
   const [isAssigning, setIsAssigning] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const [currentPriority, setCurrentPriority] = useState<Priority>(conversation.priority || "normal");
+  const [currentTags, setCurrentTags] = useState<ConversationTag[]>(conversation.tags || []);
   const scrollRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef(getSocket());
+
+  // Reset state when conversation changes
+  useEffect(() => {
+    setCurrentPriority(conversation.priority || "normal");
+    setCurrentTags(conversation.tags || []);
+  }, [conversation.id, conversation.priority, conversation.tags]);
 
   // Load messages
   useEffect(() => {
@@ -86,6 +99,19 @@ export function ConversationView({
 
     loadMessages();
   }, [conversation.id]);
+
+  // Auto-scroll to bottom when messages load or conversation changes
+  useEffect(() => {
+    if (!isLoading && messages.length > 0 && scrollRef.current) {
+      // Small delay to ensure DOM is updated
+      setTimeout(() => {
+        scrollRef.current?.scrollTo({
+          top: scrollRef.current.scrollHeight,
+          behavior: "auto", // Instant scroll on load
+        });
+      }, 100);
+    }
+  }, [isLoading, messages.length, conversation.id]);
 
   // Join conversation room
   useEffect(() => {
@@ -268,13 +294,25 @@ export function ConversationView({
     setIsClosing(false);
   }, [conversation.id, onUpdate]);
 
+  // Handle priority update
+  const handlePriorityUpdate = useCallback((priority: Priority) => {
+    setCurrentPriority(priority);
+    onUpdate?.({ ...conversation, priority });
+  }, [conversation, onUpdate]);
+
+  // Handle tags update
+  const handleTagsUpdate = useCallback((tags: ConversationTag[]) => {
+    setCurrentTags(tags);
+    onUpdate?.({ ...conversation, tags });
+  }, [conversation, onUpdate]);
+
   const displayName = conversation.customerName || "Anonymous";
   const avatarColor = stringToColor(conversation.customerId);
   const isAssigned = conversation.agentId === agentId;
   const canReply = isAssigned && conversation.status !== "closed";
 
   return (
-    <div className={cn("flex flex-col h-full bg-background", className)}>
+    <div className={cn("flex flex-col h-full min-h-0 bg-background", className)}>
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b bg-card">
         <div className="flex items-center gap-3">
@@ -312,6 +350,13 @@ export function ConversationView({
 
         {/* Actions */}
         <div className="flex items-center gap-2">
+          {/* Priority selector */}
+          <PrioritySelector
+            conversationId={conversation.id}
+            currentPriority={currentPriority}
+            onUpdate={handlePriorityUpdate}
+          />
+
           {conversation.status === "open" && (
             <Button
               variant="default"
@@ -363,10 +408,13 @@ export function ConversationView({
       </div>
 
       {/* Main content */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* Messages */}
-        <div className="flex-1 flex flex-col">
-          <ScrollArea className="flex-1 px-6 py-4" ref={scrollRef}>
+        <div className="flex-1 flex flex-col min-h-0">
+          <div 
+            ref={scrollRef}
+            className="flex-1 overflow-y-auto px-6 py-4 chat-scrollbar"
+          >
             {isLoading ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
@@ -382,19 +430,20 @@ export function ConversationView({
                     key={message.id}
                     message={message}
                     isOwn={message.senderType === "agent"}
+                    variant="admin"
                   />
                 ))}
                 {typingUser && <TypingIndicator senderName="Customer" />}
               </div>
             )}
-          </ScrollArea>
-
+          </div>
           {/* Input */}
           {canReply ? (
             <MessageInput
               onSend={handleSendMessage}
               onTyping={handleTyping}
               placeholder="Type a reply..."
+              variant="admin"
             />
           ) : (
             <div className="px-6 py-4 border-t bg-muted/50 text-center">
@@ -407,62 +456,100 @@ export function ConversationView({
           )}
         </div>
 
-        {/* Customer info sidebar */}
-        <div className="w-72 border-l bg-card p-4 hidden lg:block">
-          <h3 className="font-semibold mb-4">Customer Info</h3>
+        {/* Sidebar with tabs */}
+        <div className="w-80 border-l bg-card hidden lg:flex flex-col min-h-0">
+          <Tabs defaultValue="info" className="flex flex-col h-full">
+            <TabsList className="w-full justify-start px-4 pt-4 bg-transparent">
+              <TabsTrigger value="info" className="gap-1.5">
+                <User className="w-4 h-4" />
+                Info
+              </TabsTrigger>
+              <TabsTrigger value="tags" className="gap-1.5">
+                <Tag className="w-4 h-4" />
+                Tags
+              </TabsTrigger>
+              <TabsTrigger value="notes" className="gap-1.5">
+                <StickyNote className="w-4 h-4" />
+                Notes
+              </TabsTrigger>
+            </TabsList>
 
-          <div className="space-y-4">
-            {/* Name */}
-            <div className="flex items-start gap-3">
-              <User className="w-4 h-4 mt-0.5 text-muted-foreground" />
-              <div>
-                <p className="text-xs text-muted-foreground">Name</p>
-                <p className="text-sm">{displayName}</p>
-              </div>
-            </div>
+            {/* Customer info tab */}
+            <TabsContent value="info" className="flex-1 p-4 mt-0">
+              <div className="space-y-4">
+                {/* Name */}
+                <div className="flex items-start gap-3">
+                  <User className="w-4 h-4 mt-0.5 text-muted-foreground" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Name</p>
+                    <p className="text-sm">{displayName}</p>
+                  </div>
+                </div>
 
-            {/* Email */}
-            {conversation.customerEmail && (
-              <div className="flex items-start gap-3">
-                <Mail className="w-4 h-4 mt-0.5 text-muted-foreground" />
-                <div>
-                  <p className="text-xs text-muted-foreground">Email</p>
-                  <p className="text-sm break-all">{conversation.customerEmail}</p>
+                {/* Email */}
+                {conversation.customerEmail && (
+                  <div className="flex items-start gap-3">
+                    <Mail className="w-4 h-4 mt-0.5 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Email</p>
+                      <p className="text-sm break-all">{conversation.customerEmail}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Customer ID */}
+                <div className="flex items-start gap-3">
+                  <Hash className="w-4 h-4 mt-0.5 text-muted-foreground" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Customer ID</p>
+                    <p className="text-sm font-mono text-xs break-all">
+                      {conversation.customerId}
+                    </p>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Created */}
+                <div className="flex items-start gap-3">
+                  <Clock className="w-4 h-4 mt-0.5 text-muted-foreground" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Started</p>
+                    <p className="text-sm">{formatRelativeTime(conversation.createdAt)}</p>
+                  </div>
+                </div>
+
+                {/* Last updated */}
+                <div className="flex items-start gap-3">
+                  <Clock className="w-4 h-4 mt-0.5 text-muted-foreground" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Last activity</p>
+                    <p className="text-sm">{formatRelativeTime(conversation.updatedAt)}</p>
+                  </div>
                 </div>
               </div>
-            )}
+            </TabsContent>
 
-            {/* Customer ID */}
-            <div className="flex items-start gap-3">
-              <Hash className="w-4 h-4 mt-0.5 text-muted-foreground" />
-              <div>
-                <p className="text-xs text-muted-foreground">Customer ID</p>
-                <p className="text-sm font-mono text-xs break-all">
-                  {conversation.customerId}
-                </p>
+            {/* Tags tab */}
+            <TabsContent value="tags" className="flex-1 p-4 mt-0">
+              <div className="space-y-4">
+                <h3 className="font-semibold text-sm flex items-center gap-2">
+                  <Tag className="w-4 h-4" />
+                  Conversation Tags
+                </h3>
+                <TagSelector
+                  conversationId={conversation.id}
+                  selectedTags={currentTags}
+                  onUpdate={handleTagsUpdate}
+                />
               </div>
-            </div>
+            </TabsContent>
 
-            <Separator />
-
-            {/* Created */}
-            <div className="flex items-start gap-3">
-              <Clock className="w-4 h-4 mt-0.5 text-muted-foreground" />
-              <div>
-                <p className="text-xs text-muted-foreground">Started</p>
-                <p className="text-sm">{formatRelativeTime(conversation.createdAt)}</p>
-              </div>
-            </div>
-
-            {/* Last updated */}
-            <div className="flex items-start gap-3">
-              <Clock className="w-4 h-4 mt-0.5 text-muted-foreground" />
-              <div>
-                <p className="text-xs text-muted-foreground">Last activity</p>
-                <p className="text-sm">{formatRelativeTime(conversation.updatedAt)}</p>
-              </div>
-            </div>
-          </div>
+            {/* Notes tab */}
+            <TabsContent value="notes" className="flex-1 p-4 mt-0 overflow-hidden">
+              <NotesSection conversationId={conversation.id} />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>

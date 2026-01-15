@@ -7,7 +7,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/src/lib/prisma";
 import { CreateConversationSchema } from "@/src/types";
-import type { ConversationStatus } from "@/src/types";
+import type { ConversationStatus, Priority } from "@/src/types";
 
 /**
  * GET /api/conversations
@@ -17,6 +17,8 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status") as ConversationStatus | "all" | null;
+    const priority = searchParams.get("priority") as Priority | "all" | null;
+    const tagId = searchParams.get("tagId");
     const search = searchParams.get("search");
     const agentId = searchParams.get("agentId");
     const customerId = searchParams.get("customerId");
@@ -28,6 +30,16 @@ export async function GET(request: NextRequest) {
 
     if (status && status !== "all") {
       where.status = status;
+    }
+
+    if (priority && priority !== "all") {
+      where.priority = priority;
+    }
+
+    if (tagId) {
+      where.tags = {
+        some: { tagId },
+      };
     }
 
     if (agentId) {
@@ -49,7 +61,7 @@ export async function GET(request: NextRequest) {
     // Get total count
     const total = await prisma.conversation.count({ where });
 
-    // Get conversations with last message
+    // Get conversations with last message, tags, and notes count
     const conversations = await prisma.conversation.findMany({
       where,
       include: {
@@ -59,6 +71,11 @@ export async function GET(request: NextRequest) {
             name: true,
             email: true,
             isOnline: true,
+          },
+        },
+        tags: {
+          include: {
+            tag: true,
           },
         },
         messages: {
@@ -71,8 +88,15 @@ export async function GET(request: NextRequest) {
             createdAt: true,
           },
         },
+        _count: {
+          select: { notes: true },
+        },
       },
-      orderBy: { updatedAt: "desc" },
+      orderBy: [
+        // Urgent first, then by most recent
+        { priority: "desc" },
+        { updatedAt: "desc" },
+      ],
       skip: (page - 1) * limit,
       take: limit,
     });
@@ -127,6 +151,16 @@ export async function POST(request: NextRequest) {
         customerId,
         status: { in: ["open", "assigned"] },
       },
+      include: {
+        tags: {
+          include: {
+            tag: true,
+          },
+        },
+        _count: {
+          select: { notes: true },
+        },
+      },
     });
 
     if (existingConversation) {
@@ -144,6 +178,17 @@ export async function POST(request: NextRequest) {
         customerName,
         customerEmail,
         status: "open",
+        priority: "normal",
+      },
+      include: {
+        tags: {
+          include: {
+            tag: true,
+          },
+        },
+        _count: {
+          select: { notes: true },
+        },
       },
     });
 

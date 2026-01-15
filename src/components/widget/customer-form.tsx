@@ -1,6 +1,6 @@
 /**
- * Customer Form Component
- * Collects customer name and email before starting chat
+ * Customer Form Component - 2025 Modern Design
+ * Pre-chat form with glassmorphism
  */
 
 "use client";
@@ -8,9 +8,8 @@
 import { useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { MessageCircle, ArrowRight } from "lucide-react";
+import { User, Mail, ArrowRight, Sparkles } from "lucide-react";
 
 interface CustomerFormProps {
   requireName?: boolean;
@@ -36,10 +35,12 @@ export function CustomerForm({
       newErrors.name = "Name is required";
     }
 
-    if (requireEmail && !email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = "Please enter a valid email";
+    if (requireEmail) {
+      if (!email.trim()) {
+        newErrors.email = "Email is required";
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        newErrors.email = "Please enter a valid email";
+      }
     }
 
     setErrors(newErrors);
@@ -49,7 +50,6 @@ export function CustomerForm({
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
-
       if (validate()) {
         onSubmit({
           name: name.trim() || undefined,
@@ -60,80 +60,135 @@ export function CustomerForm({
     [name, email, validate, onSubmit]
   );
 
-  const handleSkip = useCallback(() => {
-    onSubmit({});
-  }, [onSubmit]);
-
-  const showForm = requireName || requireEmail;
-
   return (
-    <div className={cn("flex flex-col h-full", className)}>
-      {/* Welcome section */}
-      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-          <MessageCircle className="w-8 h-8 text-primary" />
-        </div>
-        <h2 className="text-xl font-semibold mb-2">Welcome! 👋</h2>
-        <p className="text-sm text-muted-foreground max-w-[280px]">
-          {showForm
-            ? "Please introduce yourself to start chatting with our support team."
-            : "Start a conversation with our support team. We're here to help!"}
-        </p>
-      </div>
-
-      {/* Form */}
-      {showForm ? (
-        <form onSubmit={handleSubmit} className="p-4 space-y-4 border-t">
-          {/* Name field */}
-          <div className="space-y-2">
-            <Label htmlFor="customer-name" className="text-sm">
-              Your name {!requireName && "(optional)"}
-            </Label>
-            <Input
-              id="customer-name"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="John Doe"
-              className={cn(errors.name && "border-destructive")}
-            />
-            {errors.name && (
-              <p className="text-xs text-destructive">{errors.name}</p>
+    <div className={cn("flex-1 flex flex-col", className)}>
+      <form onSubmit={handleSubmit} className="flex-1 flex flex-col p-6">
+        {/* Header */}
+        <div className="text-center mb-8">
+          {/* Icon */}
+          <div 
+            className={cn(
+              "inline-flex items-center justify-center",
+              "w-16 h-16 mb-4",
+              "rounded-2xl",
+              "bg-gradient-to-br from-zinc-600/20 to-zinc-800/20",
+              "border border-white/10",
+              "scale-in"
             )}
+          >
+            <Sparkles className="w-8 h-8 text-zinc-400" />
           </div>
+          
+          <h2 className="text-xl font-bold text-white mb-2">
+            Welcome! 👋
+          </h2>
+          <p className="text-sm text-gray-400 leading-relaxed">
+            Please introduce yourself so we can assist you better.
+          </p>
+        </div>
+
+        {/* Form fields */}
+        <div className="space-y-5 flex-1">
+          {/* Name field */}
+          {(requireName || !requireEmail) && (
+            <div className="space-y-2">
+              <Label 
+                htmlFor="name" 
+                className="text-sm font-medium text-gray-300 flex items-center gap-2"
+              >
+                <User className="w-4 h-4 text-zinc-400" />
+                Your Name
+                {requireName && <span className="text-red-400">*</span>}
+              </Label>
+              <Input
+                id="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter your name"
+                className={cn(
+                  "h-12 px-4",
+                  "bg-white/[0.08] text-white placeholder:text-gray-500",
+                  "border border-white/10 rounded-xl",
+                  "focus-visible:ring-1 focus-visible:ring-zinc-400/50 focus-visible:border-zinc-400/50",
+                  "transition-all duration-200",
+                  errors.name && "border-red-500/50 focus-visible:ring-red-500/50"
+                )}
+              />
+              {errors.name && (
+                <p className="text-xs text-red-400 mt-1 slide-down">{errors.name}</p>
+              )}
+            </div>
+          )}
 
           {/* Email field */}
-          <div className="space-y-2">
-            <Label htmlFor="customer-email" className="text-sm">
-              Your email {!requireEmail && "(optional)"}
-            </Label>
-            <Input
-              id="customer-email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="john@example.com"
-              className={cn(errors.email && "border-destructive")}
-            />
-            {errors.email && (
-              <p className="text-xs text-destructive">{errors.email}</p>
-            )}
-          </div>
-
-          {/* Submit button */}
-          <Button type="submit" className="w-full">
-            Start Chat
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
-        </form>
-      ) : (
-        <div className="p-4 border-t">
-          <Button onClick={handleSkip} className="w-full">
-            Start Chat
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
+          {(requireEmail || !requireName) && (
+            <div className="space-y-2">
+              <Label 
+                htmlFor="email" 
+                className="text-sm font-medium text-gray-300 flex items-center gap-2"
+              >
+                <Mail className="w-4 h-4 text-zinc-400" />
+                Email Address
+                {requireEmail && <span className="text-red-400">*</span>}
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                className={cn(
+                  "h-12 px-4",
+                  "bg-white/[0.08] text-white placeholder:text-gray-500",
+                  "border border-white/10 rounded-xl",
+                  "focus-visible:ring-1 focus-visible:ring-zinc-400/50 focus-visible:border-zinc-400/50",
+                  "transition-all duration-200",
+                  errors.email && "border-red-500/50 focus-visible:ring-red-500/50"
+                )}
+              />
+              {errors.email && (
+                <p className="text-xs text-red-400 mt-1 slide-down">{errors.email}</p>
+              )}
+            </div>
+          )}
         </div>
-      )}
+
+        {/* Submit button */}
+        <button
+          type="submit"
+          className={cn(
+            "group w-full h-12 mt-6",
+            "flex items-center justify-center gap-2",
+            "rounded-xl font-medium",
+            // Gradient background
+            "bg-gradient-to-r from-zinc-700 to-zinc-900",
+            "text-white",
+            // Shadow
+            "shadow-lg shadow-black/30",
+            "hover:shadow-xl hover:shadow-black/40",
+            // Hover animation
+            "hover:scale-[1.02] active:scale-[0.98]",
+            "transition-all duration-300",
+            // Focus
+            "focus:outline-none focus:ring-2 focus:ring-zinc-400/40"
+          )}
+        >
+          Start Chat
+          <ArrowRight 
+            className={cn(
+              "w-4 h-4",
+              "transition-transform duration-300",
+              "group-hover:translate-x-1"
+            )} 
+          />
+        </button>
+
+        {/* Privacy note */}
+        <p className="text-[11px] text-gray-500 text-center mt-4">
+          Your information is secure and will only be used to assist you.
+        </p>
+      </form>
     </div>
   );
 }

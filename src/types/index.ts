@@ -10,6 +10,7 @@ import { z } from "zod";
 
 export type ConversationStatus = "open" | "assigned" | "closed";
 export type SenderType = "agent" | "customer";
+export type Priority = "low" | "normal" | "high" | "urgent";
 
 export interface Agent {
   id: string;
@@ -30,7 +31,11 @@ export interface Conversation {
   agentId: string | null;
   agent?: Agent | null;
   status: ConversationStatus;
+  priority: Priority;
+  dueAt?: Date | null;
   messages?: Message[];
+  tags?: ConversationTag[];
+  notes?: Note[];
   unreadCount: number;
   createdAt: Date;
   updatedAt: Date;
@@ -238,6 +243,53 @@ export const CreateConversationSchema = z.object({
 export const UpdateConversationSchema = z.object({
   status: z.enum(["open", "assigned", "closed"]).optional(),
   agentId: z.string().cuid().nullable().optional(),
+  priority: z.enum(["low", "normal", "high", "urgent"]).optional(),
+});
+
+// Canned Response Schemas
+export const CreateCannedResponseSchema = z.object({
+  shortcut: z.string().min(1).max(50).regex(/^\/[a-z0-9-]+$/, "Shortcut must start with / and contain only lowercase letters, numbers, and hyphens"),
+  title: z.string().min(1).max(100),
+  content: z.string().min(1).max(5000),
+  category: z.string().max(50).optional(),
+  isShared: z.boolean().default(false),
+});
+
+export const UpdateCannedResponseSchema = z.object({
+  shortcut: z.string().min(1).max(50).regex(/^\/[a-z0-9-]+$/).optional(),
+  title: z.string().min(1).max(100).optional(),
+  content: z.string().min(1).max(5000).optional(),
+  category: z.string().max(50).optional(),
+  isActive: z.boolean().optional(),
+});
+
+// Tag Schemas
+export const CreateTagSchema = z.object({
+  name: z.string().min(1).max(50),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Color must be a valid hex color"),
+  description: z.string().max(200).optional(),
+});
+
+export const UpdateTagSchema = z.object({
+  name: z.string().min(1).max(50).optional(),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
+  description: z.string().max(200).optional(),
+});
+
+// Note Schemas
+export const CreateNoteSchema = z.object({
+  content: z.string().min(1).max(5000),
+  isPinned: z.boolean().default(false),
+});
+
+export const UpdateNoteSchema = z.object({
+  content: z.string().min(1).max(5000).optional(),
+  isPinned: z.boolean().optional(),
+});
+
+// Priority Schema
+export const UpdatePrioritySchema = z.object({
+  priority: z.enum(["low", "normal", "high", "urgent"]),
 });
 
 export const CreateMessageSchema = z.object({
@@ -271,6 +323,85 @@ export interface CustomerInfo {
 }
 
 // ============================================
+// CANNED RESPONSE TYPES
+// ============================================
+
+export interface CannedResponse {
+  id: string;
+  agentId: string | null;
+  shortcut: string;
+  title: string;
+  content: string;
+  category: string | null;
+  usageCount: number;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CannedResponseWithAgent extends CannedResponse {
+  agent: {
+    id: string;
+    name: string;
+    email: string;
+  } | null;
+}
+
+// ============================================
+// TAG TYPES
+// ============================================
+
+export interface Tag {
+  id: string;
+  name: string;
+  color: string;
+  description: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  _count?: {
+    conversations: number;
+  };
+}
+
+export interface ConversationTag {
+  id: string;
+  conversationId: string;
+  tagId: string;
+  tag: Tag;
+  addedBy: string;
+  createdAt: Date;
+}
+
+// ============================================
+// NOTE TYPES
+// ============================================
+
+export interface Note {
+  id: string;
+  conversationId: string;
+  agentId: string;
+  agent: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  content: string;
+  isPinned: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// ============================================
+// PRIORITY TYPES
+// ============================================
+
+export interface PriorityConfig {
+  label: string;
+  color: string;
+  bgColor: string;
+}
+
+// ============================================
 // ADMIN DASHBOARD TYPES
 // ============================================
 
@@ -289,19 +420,27 @@ export interface ConversationListItem {
   agentId: string | null;
   agent?: AgentSummary | null;
   status: ConversationStatus;
+  priority: Priority;
+  dueAt?: Date | null;
   unreadCount: number;
   createdAt: Date;
   updatedAt: Date;
+  tags?: ConversationTag[];
   lastMessage?: {
     id: string;
     content: string;
     createdAt: Date;
     senderType: SenderType;
   } | null;
+  _count?: {
+    notes: number;
+  };
 }
 
 export interface ConversationFilters {
   status?: ConversationStatus | "all";
+  priority?: Priority | "all";
+  tagId?: string;
   search?: string;
   agentId?: string;
 }

@@ -1,5 +1,5 @@
 /**
- * Widget Page
+ * Widget Page - 2025 Modern Design
  * Standalone page for the chat widget (used in iframe embeds)
  */
 
@@ -15,8 +15,7 @@ function WidgetContent() {
 
   // Get configuration from URL params
   const position = (searchParams.get("position") as "bottom-right" | "bottom-left") || "bottom-right";
-  const primaryColor = searchParams.get("color") || undefined;
-  const headerText = searchParams.get("header") || "Support Chat";
+  const headerTitle = searchParams.get("header") || "Support Chat";
   const welcomeMessage = searchParams.get("welcome") || "Hi there! 👋 How can we help you today?";
   const requireName = searchParams.get("requireName") === "true";
   const requireEmail = searchParams.get("requireEmail") === "true";
@@ -67,17 +66,17 @@ function WidgetContent() {
       <div 
         style={{ 
           position: "fixed",
-          bottom: "1rem",
-          right: "1rem",
+          bottom: "1.5rem",
+          right: "1.5rem",
           zIndex: 9999,
-          width: "56px",
-          height: "56px",
+          width: "64px",
+          height: "64px",
           borderRadius: "50%",
-          backgroundColor: "#0891b2",
+          background: "linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)"
+          boxShadow: "0 8px 24px rgba(99, 102, 241, 0.4)"
         }}
       >
         <div 
@@ -86,9 +85,13 @@ function WidgetContent() {
             height: "24px", 
             border: "2px solid white",
             borderTopColor: "transparent",
-            borderRadius: "50%"
+            borderRadius: "50%",
+            animation: "spin 1s linear infinite"
           }} 
         />
+        <style>
+          {`@keyframes spin { to { transform: rotate(360deg); } }`}
+        </style>
       </div>
     );
   }
@@ -96,8 +99,7 @@ function WidgetContent() {
   return (
     <ChatWidget
       position={position}
-      primaryColor={primaryColor}
-      headerText={headerText}
+      headerTitle={headerTitle}
       welcomeMessage={welcomeMessage}
       requireName={requireName}
       requireEmail={requireEmail}
@@ -107,23 +109,29 @@ function WidgetContent() {
 
 export default function WidgetPage() {
   return (
-    <div style={{ minHeight: "100vh", position: "relative" }}>
+    <div 
+      style={{ 
+        minHeight: "100vh", 
+        position: "relative",
+        background: "transparent"
+      }}
+    >
       <Suspense 
         fallback={
           <div 
             style={{ 
               position: "fixed",
-              bottom: "1rem",
-              right: "1rem",
+              bottom: "1.5rem",
+              right: "1.5rem",
               zIndex: 9999,
-              width: "56px",
-              height: "56px",
+              width: "64px",
+              height: "64px",
               borderRadius: "50%",
-              backgroundColor: "#0891b2",
+              background: "linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)"
+              boxShadow: "0 8px 24px rgba(99, 102, 241, 0.4)"
             }}
           >
             <div 
@@ -132,9 +140,13 @@ export default function WidgetPage() {
                 height: "24px", 
                 border: "2px solid white",
                 borderTopColor: "transparent",
-                borderRadius: "50%"
+                borderRadius: "50%",
+                animation: "spin 1s linear infinite"
               }} 
             />
+            <style>
+              {`@keyframes spin { to { transform: rotate(360deg); } }`}
+            </style>
           </div>
         }
       >

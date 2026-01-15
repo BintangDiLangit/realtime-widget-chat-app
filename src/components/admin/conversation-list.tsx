@@ -11,10 +11,19 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Search, MessageSquare, Clock, CheckCircle2, Loader2 } from "lucide-react";
+import { 
+  Search, 
+  MessageSquare, 
+  Clock, 
+  CheckCircle2, 
+  Loader2,
+  StickyNote,
+} from "lucide-react";
 import { formatConversationTime, truncate, getInitials, stringToColor } from "@/src/lib/utils";
 import { useAgentEvents } from "@/src/hooks/use-socket";
-import type { ConversationListItem, ConversationStatus } from "@/src/types";
+import { PriorityBadge } from "./priority-badge";
+import { TagBadge } from "./tag-badge";
+import type { ConversationListItem, ConversationStatus, Priority } from "@/src/types";
 
 interface ConversationListProps {
   initialConversations: ConversationListItem[];
@@ -32,12 +41,20 @@ const statusConfig: Record<FilterStatus, { label: string; icon: React.ReactNode 
   closed: { label: "Closed", icon: <CheckCircle2 className="w-4 h-4" /> },
 };
 
+// Priority order for sorting (urgent first)
+const priorityOrder: Record<Priority, number> = {
+  urgent: 4,
+  high: 3,
+  normal: 2,
+  low: 1,
+};
+
 export function ConversationList({
   initialConversations,
   selectedId,
   onSelect,
   className,
-}: ConversationListProps) {
+}: ConversationListProps): React.ReactElement {
   const [conversations, setConversations] = useState(initialConversations);
   const [filter, setFilter] = useState<FilterStatus>("all");
   const [search, setSearch] = useState("");
@@ -57,10 +74,14 @@ export function ConversationList({
       const updated = prev.map((c) =>
         c.id === conv.id ? { ...c, ...conv, updatedAt: new Date(conv.updatedAt || Date.now()) } : c
       );
-      // Re-sort by updatedAt to move updated conversation to top
-      return updated.sort((a, b) => 
-        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-      );
+      // Re-sort by priority then updatedAt
+      return updated.sort((a, b) => {
+        // First by priority
+        const priorityDiff = priorityOrder[b.priority || "normal"] - priorityOrder[a.priority || "normal"];
+        if (priorityDiff !== 0) return priorityDiff;
+        // Then by updatedAt
+        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+      });
     });
   }, []);
 
@@ -87,10 +108,14 @@ export function ConversationList({
     return true;
   });
 
-  // Sort by updated time
-  const sortedConversations = [...filteredConversations].sort(
-    (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-  );
+  // Sort by priority then updated time
+  const sortedConversations = [...filteredConversations].sort((a, b) => {
+    // First by priority
+    const priorityDiff = priorityOrder[b.priority || "normal"] - priorityOrder[a.priority || "normal"];
+    if (priorityDiff !== 0) return priorityDiff;
+    // Then by updatedAt
+    return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+  });
 
   // Fetch conversations
   const fetchConversations = useCallback(async () => {
@@ -201,6 +226,7 @@ function ConversationItem({
   const displayName = conversation.customerName || "Anonymous";
   const initials = getInitials(displayName);
   const avatarColor = stringToColor(conversation.customerId);
+  const notesCount = conversation._count?.notes || 0;
 
   return (
     <button
@@ -208,7 +234,10 @@ function ConversationItem({
       className={cn(
         "w-full flex items-start gap-3 p-4 text-left",
         "transition-colors hover:bg-secondary/50",
-        isSelected && "bg-secondary"
+        isSelected && "bg-secondary",
+        // Highlight urgent/high priority
+        conversation.priority === "urgent" && "border-l-2 border-l-red-500",
+        conversation.priority === "high" && "border-l-2 border-l-orange-500"
       )}
     >
       {/* Avatar */}
@@ -256,8 +285,8 @@ function ConversationItem({
           )}
         </div>
 
-        {/* Status badge */}
-        <div className="mt-2">
+        {/* Status, Priority, and Notes */}
+        <div className="flex items-center gap-1.5 mt-2 flex-wrap">
           <Badge
             variant={
               conversation.status === "open"
@@ -266,11 +295,38 @@ function ConversationItem({
                 ? "default"
                 : "outline"
             }
-            className="text-xs"
+            className="text-[10px]"
           >
             {conversation.status}
           </Badge>
+          
+          {/* Priority badge (only show if not normal) */}
+          {conversation.priority && conversation.priority !== "normal" && (
+            <PriorityBadge priority={conversation.priority} size="sm" showIcon={false} />
+          )}
+
+          {/* Notes count */}
+          {notesCount > 0 && (
+            <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
+              <StickyNote className="w-3 h-3" />
+              {notesCount}
+            </span>
+          )}
         </div>
+
+        {/* Tags */}
+        {conversation.tags && conversation.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-2">
+            {conversation.tags.slice(0, 3).map((convTag) => (
+              <TagBadge key={convTag.id} tag={convTag.tag} size="sm" />
+            ))}
+            {conversation.tags.length > 3 && (
+              <span className="text-[10px] text-muted-foreground self-center">
+                +{conversation.tags.length - 3}
+              </span>
+            )}
+          </div>
+        )}
       </div>
     </button>
   );

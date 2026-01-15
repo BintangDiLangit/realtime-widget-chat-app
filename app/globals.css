@@ -3,6 +3,10 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ============================================
+   2025 MODERN DESIGN SYSTEM - BLACK & WHITE THEME
+   ============================================ */
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -47,84 +51,148 @@
   /* Custom widget colors */
   --color-widget-primary: var(--widget-primary);
   --color-widget-primary-foreground: var(--widget-primary-foreground);
+  --color-widget-accent: var(--widget-accent);
+  --color-widget-glass: var(--widget-glass);
+  --color-widget-glass-border: var(--widget-glass-border);
 }
 
+/* ============================================
+   LIGHT MODE - Elegant Black & White Theme
+   ============================================ */
 :root {
   --radius: 0.75rem;
-  /* Distinctive teal/cyan color scheme */
-  --background: oklch(0.99 0.002 240);
-  --foreground: oklch(0.15 0.02 260);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.15 0.02 260);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.15 0.02 260);
-  /* Vibrant teal primary */
-  --primary: oklch(0.55 0.18 195);
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.96 0.01 240);
-  --secondary-foreground: oklch(0.25 0.02 260);
-  --muted: oklch(0.96 0.01 240);
-  --muted-foreground: oklch(0.5 0.02 260);
-  --accent: oklch(0.92 0.04 195);
-  --accent-foreground: oklch(0.25 0.02 260);
-  --destructive: oklch(0.55 0.22 25);
-  --border: oklch(0.9 0.01 240);
-  --input: oklch(0.9 0.01 240);
-  --ring: oklch(0.55 0.18 195);
-  --chart-1: oklch(0.55 0.18 195);
-  --chart-2: oklch(0.65 0.15 160);
-  --chart-3: oklch(0.45 0.12 280);
-  --chart-4: oklch(0.75 0.15 85);
-  --chart-5: oklch(0.6 0.2 30);
-  --sidebar: oklch(0.98 0.005 240);
-  --sidebar-foreground: oklch(0.15 0.02 260);
-  --sidebar-primary: oklch(0.55 0.18 195);
-  --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.94 0.02 195);
-  --sidebar-accent-foreground: oklch(0.25 0.02 260);
-  --sidebar-border: oklch(0.9 0.01 240);
-  --sidebar-ring: oklch(0.55 0.18 195);
-  /* Widget specific */
-  --widget-primary: oklch(0.55 0.18 195);
-  --widget-primary-foreground: oklch(0.99 0 0);
+  
+  /* Base Colors - Clean White */
+  --background: #FAFAFA;
+  --foreground: #18181B;
+  --card: #FFFFFF;
+  --card-foreground: #18181B;
+  --popover: #FFFFFF;
+  --popover-foreground: #18181B;
+  
+  /* Primary - Pure Black */
+  --primary: #18181B;
+  --primary-foreground: #FFFFFF;
+  
+  /* Secondary - Soft Gray */
+  --secondary: #F4F4F5;
+  --secondary-foreground: #3F3F46;
+  
+  /* Muted */
+  --muted: #F4F4F5;
+  --muted-foreground: #71717A;
+  
+  /* Accent - Light Gray */
+  --accent: #E4E4E7;
+  --accent-foreground: #18181B;
+  
+  /* Destructive */
+  --destructive: #DC2626;
+  
+  /* Border & Input */
+  --border: #E4E4E7;
+  --input: #E4E4E7;
+  --ring: #18181B;
+  
+  /* Charts - Grayscale with accent */
+  --chart-1: #18181B;
+  --chart-2: #3F3F46;
+  --chart-3: #71717A;
+  --chart-4: #A1A1AA;
+  --chart-5: #D4D4D8;
+  
+  /* Sidebar */
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #18181B;
+  --sidebar-primary: #18181B;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #F4F4F5;
+  --sidebar-accent-foreground: #18181B;
+  --sidebar-border: #E4E4E7;
+  --sidebar-ring: #18181B;
+  
+  /* Widget Specific - Black & White */
+  --widget-primary: #18181B;
+  --widget-primary-foreground: #FFFFFF;
+  --widget-accent: #3F3F46;
+  --widget-glass: rgba(255, 255, 255, 0.9);
+  --widget-glass-border: rgba(0, 0, 0, 0.08);
+  --widget-glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  
+  /* Gradient - Subtle */
+  --gradient-primary: linear-gradient(135deg, #18181B 0%, #3F3F46 100%);
+  --gradient-glow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
+/* ============================================
+   DARK MODE - Elegant Dark Theme
+   ============================================ */
 .dark {
-  --background: oklch(0.12 0.02 260);
-  --foreground: oklch(0.95 0.01 240);
-  --card: oklch(0.16 0.02 260);
-  --card-foreground: oklch(0.95 0.01 240);
-  --popover: oklch(0.16 0.02 260);
-  --popover-foreground: oklch(0.95 0.01 240);
-  --primary: oklch(0.65 0.18 195);
-  --primary-foreground: oklch(0.1 0.02 260);
-  --secondary: oklch(0.22 0.02 260);
-  --secondary-foreground: oklch(0.95 0.01 240);
-  --muted: oklch(0.22 0.02 260);
-  --muted-foreground: oklch(0.65 0.02 240);
-  --accent: oklch(0.25 0.04 195);
-  --accent-foreground: oklch(0.95 0.01 240);
-  --destructive: oklch(0.6 0.2 25);
-  --border: oklch(0.25 0.02 260);
-  --input: oklch(0.25 0.02 260);
-  --ring: oklch(0.65 0.18 195);
-  --chart-1: oklch(0.65 0.18 195);
-  --chart-2: oklch(0.7 0.15 160);
-  --chart-3: oklch(0.55 0.12 280);
-  --chart-4: oklch(0.8 0.15 85);
-  --chart-5: oklch(0.65 0.2 30);
-  --sidebar: oklch(0.14 0.02 260);
-  --sidebar-foreground: oklch(0.95 0.01 240);
-  --sidebar-primary: oklch(0.65 0.18 195);
-  --sidebar-primary-foreground: oklch(0.1 0.02 260);
-  --sidebar-accent: oklch(0.22 0.04 195);
-  --sidebar-accent-foreground: oklch(0.95 0.01 240);
-  --sidebar-border: oklch(0.25 0.02 260);
-  --sidebar-ring: oklch(0.65 0.18 195);
-  --widget-primary: oklch(0.65 0.18 195);
-  --widget-primary-foreground: oklch(0.1 0.02 260);
+  /* Base Colors - Deep Black */
+  --background: #09090B;
+  --foreground: #FAFAFA;
+  --card: #18181B;
+  --card-foreground: #FAFAFA;
+  --popover: #18181B;
+  --popover-foreground: #FAFAFA;
+  
+  /* Primary - Pure White */
+  --primary: #FAFAFA;
+  --primary-foreground: #18181B;
+  
+  /* Secondary */
+  --secondary: #27272A;
+  --secondary-foreground: #FAFAFA;
+  
+  /* Muted */
+  --muted: #27272A;
+  --muted-foreground: #A1A1AA;
+  
+  /* Accent */
+  --accent: #3F3F46;
+  --accent-foreground: #FAFAFA;
+  
+  /* Destructive */
+  --destructive: #EF4444;
+  
+  /* Border & Input */
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: #FAFAFA;
+  
+  /* Charts */
+  --chart-1: #FAFAFA;
+  --chart-2: #D4D4D8;
+  --chart-3: #A1A1AA;
+  --chart-4: #71717A;
+  --chart-5: #52525B;
+  
+  /* Sidebar */
+  --sidebar: #18181B;
+  --sidebar-foreground: #FAFAFA;
+  --sidebar-primary: #FAFAFA;
+  --sidebar-primary-foreground: #18181B;
+  --sidebar-accent: #27272A;
+  --sidebar-accent-foreground: #FAFAFA;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: #FAFAFA;
+  
+  /* Widget Specific - Dark */
+  --widget-primary: #FAFAFA;
+  --widget-primary-foreground: #18181B;
+  --widget-accent: #D4D4D8;
+  --widget-glass: rgba(255, 255, 255, 0.08);
+  --widget-glass-border: rgba(255, 255, 255, 0.1);
+  --widget-glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  
+  /* Gradient */
+  --gradient-primary: linear-gradient(135deg, #FAFAFA 0%, #D4D4D8 100%);
+  --gradient-glow: 0 8px 24px rgba(255, 255, 255, 0.1);
 }
 
+/* ============================================
+   BASE STYLES
+   ============================================ */
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -133,9 +201,60 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+  
+  /* Full height for admin panel */
+  html, body {
+    height: 100%;
+  }
+  
+  #__next {
+    height: 100%;
+  }
 }
 
-/* Custom scrollbar for chat */
+/* ============================================
+   GLASSMORPHISM UTILITIES
+   ============================================ */
+.glass {
+  background: var(--widget-glass);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--widget-glass-border);
+}
+
+.glass-sm {
+  background: var(--widget-glass);
+  backdrop-filter: blur(8px) saturate(150%);
+  -webkit-backdrop-filter: blur(8px) saturate(150%);
+  border: 1px solid var(--widget-glass-border);
+}
+
+.glass-lg {
+  background: var(--widget-glass);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border: 1px solid var(--widget-glass-border);
+}
+
+.glass-dark {
+  background: rgba(9, 9, 11, 0.85);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Gradient backgrounds */
+.gradient-primary {
+  background: var(--gradient-primary);
+}
+
+.gradient-glow {
+  box-shadow: var(--gradient-glow);
+}
+
+/* ============================================
+   CUSTOM SCROLLBAR - Modern Thin
+   ============================================ */
 .chat-scrollbar::-webkit-scrollbar {
   width: 6px;
 }
@@ -145,95 +264,211 @@
 }
 
 .chat-scrollbar::-webkit-scrollbar-thumb {
-  background: oklch(0.8 0.01 240);
-  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
 }
 
 .chat-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: oklch(0.7 0.01 240);
+  background: rgba(0, 0, 0, 0.35);
 }
 
 .dark .chat-scrollbar::-webkit-scrollbar-thumb {
-  background: oklch(0.35 0.02 260);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .dark .chat-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: oklch(0.45 0.02 260);
+  background: rgba(255, 255, 255, 0.35);
 }
 
-/* Typing indicator animation */
-@keyframes typing-dot {
-  0%, 60%, 100% {
-    transform: translateY(0);
-    opacity: 0.4;
+/* ============================================
+   ADMIN CHAT CONTAINER
+   ============================================ */
+.admin-chat-container {
+  height: calc(100vh - 160px);
+  min-height: 400px;
+  overflow-y: auto;
+}
+
+/* ============================================
+   ANIMATIONS - 2025 Micro-interactions
+   ============================================ */
+
+/* Chat Button Pulse */
+@keyframes chat-button-pulse {
+  0%, 100% {
+    transform: scale(1);
   }
-  30% {
-    transform: translateY(-4px);
-    opacity: 1;
+  50% {
+    transform: scale(1.05);
   }
 }
 
-.typing-dot {
-  animation: typing-dot 1.4s infinite ease-in-out;
+.chat-button-pulse {
+  animation: chat-button-pulse 2s ease-in-out infinite;
 }
 
-.typing-dot:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.typing-dot:nth-child(3) {
-  animation-delay: 0.4s;
-}
-
-/* Widget entrance animation */
-@keyframes widget-slide-up {
-  from {
+/* Pulse Ring Glow */
+@keyframes pulse-ring-glow {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+    box-shadow: 0 0 0 0 rgba(24, 24, 27, 0.7);
+  }
+  70% {
+    transform: scale(1.3);
     opacity: 0;
-    transform: translateY(20px) scale(0.95);
+    box-shadow: 0 0 0 20px rgba(24, 24, 27, 0);
   }
-  to {
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+.pulse-ring {
+  animation: pulse-ring-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Widget Entrance - Bounce Up */
+@keyframes widget-bounce-up {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) scale(0.9);
+  }
+  50% {
+    transform: translateY(-10px) scale(1.02);
+  }
+  100% {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
 }
 
 .widget-enter {
-  animation: widget-slide-up 0.3s ease-out forwards;
+  animation: widget-bounce-up 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
 }
 
-/* Message bubble animation */
-@keyframes message-appear {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.message-appear {
-  animation: message-appear 0.2s ease-out forwards;
-}
-
-/* Pulse animation for chat button */
-@keyframes pulse-ring {
+/* Widget Exit */
+@keyframes widget-exit {
   0% {
+    opacity: 1;
     transform: scale(1);
-    opacity: 0.8;
   }
   100% {
-    transform: scale(1.5);
     opacity: 0;
+    transform: scale(0.9) translateY(20px);
   }
 }
 
-.pulse-ring {
-  animation: pulse-ring 2s infinite;
+.widget-exit {
+  animation: widget-exit 0.25s ease-in forwards;
 }
 
-/* Shimmer loading animation for skeletons */
+/* Message Slide In - Customer (Left) */
+@keyframes message-slide-left {
+  0% {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.message-slide-left {
+  animation: message-slide-left 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Message Slide In - Agent (Right) */
+@keyframes message-slide-right {
+  0% {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.message-slide-right {
+  animation: message-slide-right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Message Send Animation */
+@keyframes message-send {
+  0% {
+    opacity: 0.5;
+    transform: translateY(20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.message-send {
+  animation: message-send 0.3s ease-out forwards;
+}
+
+/* Typing Indicator Dots */
+@keyframes typing-wave {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-8px);
+    opacity: 1;
+  }
+}
+
+.typing-dot {
+  animation: typing-wave 1.4s ease-in-out infinite;
+}
+
+.typing-dot:nth-child(1) { animation-delay: 0ms; }
+.typing-dot:nth-child(2) { animation-delay: 150ms; }
+.typing-dot:nth-child(3) { animation-delay: 300ms; }
+
+/* Badge Pop */
+@keyframes badge-pop {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.badge-pop {
+  animation: badge-pop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+/* Checkmark Animation */
+@keyframes checkmark-appear {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.checkmark-appear {
+  animation: checkmark-appear 0.3s ease-out forwards;
+}
+
+/* Shimmer for Skeleton Loading */
 @keyframes shimmer {
   0% {
     background-position: -200% 0;
@@ -246,9 +481,9 @@
 .skeleton {
   background: linear-gradient(
     90deg,
-    oklch(0.9 0.01 240) 25%,
-    oklch(0.95 0.005 240) 50%,
-    oklch(0.9 0.01 240) 75%
+    rgba(0, 0, 0, 0.05) 25%,
+    rgba(0, 0, 0, 0.1) 50%,
+    rgba(0, 0, 0, 0.05) 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
@@ -257,28 +492,24 @@
 .dark .skeleton {
   background: linear-gradient(
     90deg,
-    oklch(0.25 0.02 260) 25%,
-    oklch(0.3 0.015 260) 50%,
-    oklch(0.25 0.02 260) 75%
+    rgba(255, 255, 255, 0.05) 25%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 75%
   );
   background-size: 200% 100%;
 }
 
-/* Fade in animation */
+/* Fade In */
 @keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .fade-in {
   animation: fade-in 0.3s ease-out forwards;
 }
 
-/* Scale in animation */
+/* Scale In */
 @keyframes scale-in {
   from {
     opacity: 0;
@@ -294,51 +525,148 @@
   animation: scale-in 0.2s ease-out forwards;
 }
 
-/* Slide in from right */
-@keyframes slide-in-right {
+/* Slide Up */
+@keyframes slide-up {
   from {
     opacity: 0;
-    transform: translateX(20px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(0);
   }
 }
 
-.slide-in-right {
-  animation: slide-in-right 0.3s ease-out forwards;
+.slide-up {
+  animation: slide-up 0.3s ease-out forwards;
 }
 
-/* Unread badge bounce */
-@keyframes badge-bounce {
-  0%, 100% {
-    transform: scale(1);
+/* Slide Down */
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
   }
-  50% {
-    transform: scale(1.2);
-  }
-}
-
-.badge-bounce {
-  animation: badge-bounce 0.3s ease-out;
-}
-
-/* Connection status indicator pulse */
-@keyframes status-pulse {
-  0%, 100% {
+  to {
     opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-down {
+  animation: slide-down 0.3s ease-out forwards;
+}
+
+/* Online Status Glow */
+@keyframes status-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
   }
   50% {
-    opacity: 0.5;
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
   }
 }
 
-.status-pulse {
-  animation: status-pulse 2s infinite;
+.status-glow {
+  animation: status-glow 2s ease-in-out infinite;
 }
 
-/* Smooth transitions for interactive elements */
+/* Send Button Rotation */
+@keyframes send-rotate {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(45deg) scale(0.8);
+  }
+  100% {
+    transform: rotate(45deg) scale(0);
+  }
+}
+
+.send-rotate {
+  animation: send-rotate 0.4s ease-in-out forwards;
+}
+
+/* Scroll Button Bounce */
+@keyframes scroll-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.scroll-bounce {
+  animation: scroll-bounce 1s ease-in-out infinite;
+}
+
+/* ============================================
+   FOCUS STATES - Accessibility
+   ============================================ */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-primary/40 focus:ring-offset-2 focus:ring-offset-background;
+}
+
+/* ============================================
+   REDUCED MOTION - Accessibility
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .chat-button-pulse,
+  .pulse-ring,
+  .typing-dot,
+  .status-glow,
+  .scroll-bounce {
+    animation: none !important;
+  }
+}
+
+/* ============================================
+   TRANSITIONS
+   ============================================ */
 .transition-smooth {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.transition-bounce {
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.transition-spring {
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ============================================
+   GRADIENTS & EFFECTS
+   ============================================ */
+.gradient-shine {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 200%;
+  animation: shine 3s ease-in-out infinite;
+}
+
+@keyframes shine {
+  0% { background-position: 200% 200%; }
+  100% { background-position: -200% -200%; }
+}
+
+/* Message fade at top */
+.message-fade-top {
+  mask-image: linear-gradient(to bottom, transparent 0%, black 30px);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 30px);
 }

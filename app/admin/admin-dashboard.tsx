@@ -87,13 +87,13 @@ export function AdminDashboard({
   }, []);
 
   return (
-    <div className="flex-1 flex overflow-hidden">
+    <div className="flex-1 flex min-h-0 overflow-hidden">
       {/* Sidebar */}
       <ConversationList
         initialConversations={conversations}
         selectedId={selectedConversation?.id}
         onSelect={handleSelectConversation}
-        className="w-80 shrink-0"
+        className="w-80 shrink-0 min-h-0"
       />
 
       {/* Main content */}
