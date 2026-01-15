@@ -53,7 +53,13 @@ export async function GET(request: NextRequest) {
     });
 
     // Group by category
-    const categories = [...new Set(responses.map((r) => r.category).filter(Boolean))];
+    const categories = Array.from(
+      new Set(
+        responses
+          .map((r: (typeof responses)[number]) => r.category)
+          .filter((cat: string | null): cat is string => cat !== null && cat !== undefined)
+      )
+    );
 
     return NextResponse.json({ 
       success: true, 
